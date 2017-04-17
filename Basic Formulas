@@ -1,0 +1,64 @@
+Option Explicit
+
+'Calculate the price of a Call Option (European vanilla, no dividends)
+
+Function CallPrice(S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+
+    'S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
+
+Dim dOne As Double
+
+Dim dTwo As Double
+
+dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
+
+dTwo = dOne - (vol * Sqr(ttm))
+
+CallPrice = Application.NormSDist(dOne) * S - Application.NormSDist(dTwo) * X * Exp(-rf * ttm)
+
+End Function
+
+'Calculate the price of a Put Option (European vanilla, no dividends)
+
+Function PutPrice(S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+
+    'S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
+
+Dim dOne As Double
+
+Dim dTwo As Double
+
+dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
+
+dTwo = dOne - (vol * Sqr(ttm))
+
+PutPrice = Application.NormSDist(-dOne) * (-S) + Application.NormSDist(-dTwo) * X * Exp(-rf * ttm)
+
+End Function
+
+'Calculate the probability of exercise
+
+Function PrEx(OptType As Integer, S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+
+    'OptType = 0 if Call & 1 if Put, S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
+
+    Dim dOne As Double
+    Dim dTwo As Double
+
+dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
+
+If OptType = 0 Then
+
+    dTwo = dOne - (vol * Sqr(ttm))
+
+ElseIf OptType = 1 Then
+    
+    dTwo = -dOne + (vol * Sqr(ttm))
+
+ElseIf OptType <> 0 Or 1 Then
+    MsgBox "Error: option type must be 0 (call) or 1 (put)."
+End If
+
+PrEx = Application.NormSDist(dTwo)
+
+End Function
