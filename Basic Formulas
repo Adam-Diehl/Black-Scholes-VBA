@@ -1,28 +1,10 @@
 Option Explicit
 
-'Calculate the price of a Call Option (European vanilla, no dividends)
+'Calculate the price of an Option (European vanilla, no dividends)
 
-Function CallPrice(S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+Function BSPrice(S As Double, X As Double, ttm As Double, rf As Double, vol As Double, OptType As Integer) As Double
 
-    'S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
-
-Dim dOne As Double
-
-Dim dTwo As Double
-
-dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
-
-dTwo = dOne - (vol * Sqr(ttm))
-
-CallPrice = Application.NormSDist(dOne) * S - Application.NormSDist(dTwo) * X * Exp(-rf * ttm)
-
-End Function
-
-'Calculate the price of a Put Option (European vanilla, no dividends)
-
-Function PutPrice(S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
-
-    'S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
+    'S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility, OptType is 0 for call, 1 for put
 
 Dim dOne As Double
 
@@ -30,15 +12,29 @@ Dim dTwo As Double
 
 dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
 
-dTwo = dOne - (vol * Sqr(ttm))
+If OptType = 0 Then
 
-PutPrice = Application.NormSDist(-dOne) * (-S) + Application.NormSDist(-dTwo) * X * Exp(-rf * ttm)
+    dTwo = dOne - (vol * Sqr(ttm))
+
+BSPrice = Application.NormSDist(dOne) * S - Application.NormSDist(dTwo) * X * Exp(-rf * ttm)
+
+ElseIf OptType = 1 Then
+
+    dTwo = -dOne + (vol * Sqr(ttm))
+
+BSPrice = -Application.NormSDist(-dOne) * S + Application.NormSDist(dTwo) * X * Exp(-rf * ttm)
+
+ElseIf OptType <> 0 Or 1 Then
+
+    MsgBox "Error: option type must be 1 (call) or 2 (put)."
+
+End If
 
 End Function
 
 'Calculate the probability of exercise
 
-Function PrEx(OptType As Integer, S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+Function BSPrEx(OptType As Integer, S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
 
     'OptType = 0 if Call & 1 if Put, S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
 
@@ -59,6 +55,40 @@ ElseIf OptType <> 0 Or 1 Then
     MsgBox "Error: option type must be 0 (call) or 1 (put)."
 End If
 
-PrEx = Application.NormSDist(dTwo)
+BSPrEx = Application.NormSDist(dTwo)
+
+End Function
+
+'Calculate the delta of the option
+
+Function BSDelta(S As Double, X As Double, ttm As Double, rf As Double, vol As Double, OptType As Integer) As Double
+
+Dim dOne As Double
+
+dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
+
+If OptType = 0 Then
+
+    BSDelta = Application.NormSDist(dOne)
+
+ElseIf OptType = 1 Then
+    
+    BSDelta = Application.NormSDist(dOne) - 1
+
+ElseIf OptType <> 0 Or 1 Then
+    MsgBox "Error: option type must be 0 (call) or 1 (put)."
+End If
+
+End Function
+
+'Calculate the vega of the option
+
+Function BSVega(S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+
+Dim dOne As Double
+
+dOne = (1 / (vol * Sqr(ttm))) * (Log(S / X) + (rf + 0.5 * vol ^ 2) * ttm)
+
+BSVega = S * Sqr(ttm) * Application.NormDist(dOne, 0, 1, False)
 
 End Function
