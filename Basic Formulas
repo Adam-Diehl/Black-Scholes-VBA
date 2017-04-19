@@ -34,7 +34,7 @@ End Function
 
 'Calculate the probability of exercise
 
-Function BSPrEx(OptType As Integer, S As Double, X As Double, ttm As Double, rf As Double, vol As Double) As Double
+Function BSPrEx(S As Double, X As Double, ttm As Double, rf As Double, vol As Double, OptType As Integer) As Double
 
     'OptType = 0 if Call & 1 if Put, S = initial stock price, x = strike price, ttm = time to maturity, rf = risk free rate, vol = volatility
 
