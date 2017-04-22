@@ -26,7 +26,7 @@ BSPrice = -Application.NormSDist(-dOne) * S + Application.NormSDist(dTwo) * X * 
 
 ElseIf OptType <> 0 Or 1 Then
 
-    MsgBox "Error: option type must be 1 (call) or 2 (put)."
+    MsgBox "Error: option type must be 0 (call) or 1 (put)."
 
 End If
 
